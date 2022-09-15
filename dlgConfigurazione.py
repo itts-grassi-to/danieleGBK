@@ -32,7 +32,7 @@ class DlgNuovo(Gtk.Window):
 			self.bks = ast.literal_eval(data.read())
 			data.close()
 		
-		print(self.bks)
+		#print(self.bks)
 		self.set_default_size(400, 300)    
 		#self.set_border_width(10)
 		grid=Gtk.Grid()
@@ -120,31 +120,101 @@ class DlgNuovo(Gtk.Window):
 class DlgConf(Gtk.Window):
     def __init__(self,diz):
         super().__init__(title="Configurazione backups")
-        #print(diz)
-        self.set_default_size(300, 300)
+        print(diz)
+        self.bk=diz
+        self.set_default_size(500, 300)
         self.set_border_width(10)
+        box = Gtk.Grid()
         self.nb=Gtk.Notebook()
-        #box = self.get_content_area()
-        self.add(self.nb)
+        self.nb.set_property("width-request", 480)
+        self.nb.set_property("height-request",260)
+        #self.add(self.nb)
+        box.attach(self.nb,0,0,1,1)
 		
-        #prima pagina
-        self.generale=Gtk.Box()
-        self.generale.set_border_width(10)
-        self.generale.add(Gtk.Label("corpo della tab strip"))
-        self.nb.append_page(self.generale,Gtk.Label("GENERALE"))
+        self.__primaPagina()
+        self.__secondaPagina()
         
-        #seconda pagina
-        self.pg2=Gtk.Box()
-        self.pg2.set_border_width(10)
-        self.pg2.add(Gtk.Label("corpo della pagina2"))
-        self.nb.append_page(self.pg2,Gtk.Label("Pagina2"))
+        #self.add(self.__attachButton())
+        box.attach(self.__attachButton(),0,1,1,1)
         #label = Gtk.Label(label="This is a dialog to display additional information")
 
         #box = self.get_content_area()
         #box.add(label)
+        self.add(box)
         self.show_all()
+#************************** ORIGINE ********************************        
+    def __secondaPagina(self):
+        #seconda pagina
+        pg2=Gtk.Grid()
+        pg2.set_border_width(10)
+        pg2.set_property("width-request", 200)
+        pg2.set_property("height-request",15)
+        
+        h=Gtk.Box(spacing=10)
+        rdLocale = Gtk.RadioButton.new_with_label_from_widget(None, "Locale")
+        rdLocale.connect("toggled", self.on_rd_toggled, "1")
+        #pg2.attach(rdLocale,0,0,1,1)       
+        #pg2.attach(Gtk.Entry(text="locale"),1,0,1,1)
+        h.add(rdLocale)
+        h.add(Gtk.Entry(text="locale"))
+        button = Gtk.Button.new_with_mnemonic("Nuovo")
+        button.set_property("width-request", 85)
+        button.set_property("height-request",15)
+        h.add(button)
+        #button.connect("clicked", self.on_nuovo_clicked)
+        #pg2.attach(button,2,0,1,1)
+        pg2.attach(h,0,0,1,1)
+        
+        h=Gtk.Box(spacing=10)
+        rdRemoto = Gtk.RadioButton.new_with_label_from_widget(rdLocale, "Remoto")
+        rdRemoto.connect("toggled", self.on_rd_toggled, "2")
+        #pg2.attach(rdRemoto,0,1,1,1)       
+        #pg2.attach(Gtk.Label(label="Utente"),1,1,1,1)
+        h.add(rdRemoto)
+        self.utente=Gtk.Entry(text="")
+        #pg2.attach(self.utente,2,1,1,1)
+        h.add(self.utente)
+        pg2.attach(h,0,1,1,1)
+        self.nb.append_page(pg2,Gtk.Label(label="ORIGINE"))
+    def on_rd_toggled(self,rd,name):
+	    if rd.get_active():
+		    state = "on"
+	    else:
+		    state = "off"
+	    print("Button", name, "was turned", state)		
+#******************************************************************
+    def __primaPagina(self):
+        #prima pagina
+        self.generale=Gtk.Grid()
+        self.generale.set_border_width(10)
+        self.generale.attach(Gtk.Label(label=self.bk['titolo']),0,0,1,1)
+        self.nb.append_page(self.generale,Gtk.Label(label="GENERALE"))
+    def __attachButton(self):
+	    hbox2=Gtk.Box(spacing=6)
+	    button = Gtk.Button.new_with_mnemonic("Annulla")
+	    button.set_property("width-request", 85)
+	    button.set_property("height-request",15)
+	    button.connect("clicked", self.on_annulla_clicked)
+	    hbox2.add(button)
+	    
+	    button = Gtk.Button.new_with_mnemonic("Salva")
+	    button.set_property("width-request", 85)
+	    button.set_property("height-request",15)
+	    button.connect("clicked", self.on_salva_clicked)
+	    hbox2.add(button)	
+	    return hbox2
+    def on_annulla_clicked(self):
+	    printf("Annulla")
+    def on_salva_clicked(self):
+        print("salva")	
+	
+def getImpostazioni(f):
+		with open(f, "r") as data:
+			d = ast.literal_eval(data.read())
+			data.close()
+			return d
 
-#win=DlgNuovo("./danieleBK.conf")
-#win.connect("destroy", Gtk.main_quit)
-#win.show_all()
-#Gtk.main()
+win=DlgConf(getImpostazioni("./danieleBK.conf")['chDef'])
+win.connect("destroy", Gtk.main_quit)
+win.show_all()
+Gtk.main()
