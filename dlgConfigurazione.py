@@ -133,7 +133,7 @@ class DlgConf(Gtk.Window):
 		
         self.__primaPagina()
         self.__secondaPagina()
-        
+        self.__terzaPagina()
         #self.add(self.__attachButton())
         box.attach(self.__attachButton(),0,1,1,1)
         #label = Gtk.Label(label="This is a dialog to display additional information")
@@ -142,46 +142,175 @@ class DlgConf(Gtk.Window):
         #box.add(label)
         self.add(box)
         self.show_all()
+#************************** DESTINAZIONE ********************************        
+    def __terzaPagina(self):
+        #seconda pagina
+        pg2=Gtk.Grid()
+        pg2.set_border_width(5)
+        pg2.set_property("width-request", 300)
+        #pg2.set_property("height-request",150)
+        larg1=90
+        
+        h=Gtk.Box(spacing=10)
+        rdLocaleTO = Gtk.RadioButton.new_with_label_from_widget(None, "Locale")
+        rdLocaleTO.set_property("width-request", larg1)
+        rdLocaleTO.connect("toggled", self.on_rd_toggledTO, "loc")
+        h.add(rdLocaleTO)
+        
+        self.txtLocPathTO=Gtk.Entry(text="",editable=False)
+        self.txtLocPathTO.set_property("max-width-chars", 35)
+        h.add(self.txtLocPathTO)
+
+        self.btLocPathTO = Gtk.Button.new_with_mnemonic("---")
+        self.btLocPathTO.set_property("width-request", 25)
+        self.btLocPathTO.set_property("height-request",15)
+        h.add(self.btLocPathTO)
+        pg2.attach(h,0,0,1,1)
+        
+        l=Gtk.HSeparator()
+        l.set_property("height-request",10)
+        l.set_property("margin",10)
+        pg2.attach(l,0,1,4,1)
+        
+        h=Gtk.Box(spacing=10)
+        self.rdRemotoTO = Gtk.RadioButton.new_with_label_from_widget(rdLocaleTO, "Remoto")
+        self.rdRemotoTO.set_property("width-request", larg1)
+        #rdRemoto.connect("toggled", self.on_rd_toggled, "2")
+        h.add(self.rdRemotoTO)
+        h.add(Gtk.Label(label="Host",width_request=50,xalign=1))
+        self.txtHostTO=Gtk.Entry(text="")
+        #pg2.attach(self.utente,2,1,1,1)
+        h.add(self.txtHostTO)
+        pg2.attach(h,0,2,1,1)
+        
+        h=Gtk.Box(spacing=10)
+        h.add(Gtk.Label(label="",width_request=larg1))
+        h.add(Gtk.Label(label="Utente",width_request=50,xalign=1))
+        self.txtUtenteTO=Gtk.Entry(text="")
+        h.add(self.txtUtenteTO)
+        pg2.attach(h,0,3,1,1)
+        
+        h=Gtk.Box(spacing=10)
+        h.add(Gtk.Label(label="",width_request=larg1))
+        h.add(Gtk.Label(label="Path",width_request=50,xalign=1))
+        self.txtRemPathTO=Gtk.Entry(text="",max_width_chars=35)
+        #self.txtRemPath.set_property("max-width-chars", 35)
+        h.add(self.txtRemPathTO)
+        pg2.attach(h,0,4,1,1)
+        
+        self.nb.append_page(pg2,Gtk.Label(label="DESTINAZIONE"))
+        
+        self.__initOrigineTO()
+    def __initOrigineTO(self):
+	    if self.bk['dirTO']['remotoTO']==True:
+		    self.rdRemotoTO.set_active(True)
+		    i=self.bk['dirTO']['to'].find("@")
+		    if i!=-1:
+			    self.txtUtenteTO.set_text(self.bk['dirTO']['to'][:i])
+			    ii=self.bk['dirTO']['to'].find(":")
+			    if ii!=-1:
+				    self.txtHostTO.set_text(self.bk['dirTO']['to'][i+1:ii])
+				    self.txtRemPathTO.set_text(self.bk['dirTO']['to'][ii+1:])
+    def on_rd_toggledTO(self,rd,name):
+	    if rd.get_active():
+		    self.btLocPathTO.set_sensitive(True)
+		    self.txtHostTO.set_editable(False)
+		    self.txtUtenteTO.set_editable(False)
+		    self.txtRemPathTO.set_editable(False)
+	    else:
+		    self.txtHostTO.set_editable(True)
+		    self.txtUtenteTO.set_editable(True)
+		    self.txtRemPathTO.set_editable(True)
+		    self.btLocPathTO.set_sensitive(False)
+            
+		
 #************************** ORIGINE ********************************        
     def __secondaPagina(self):
         #seconda pagina
         pg2=Gtk.Grid()
-        pg2.set_border_width(10)
-        pg2.set_property("width-request", 200)
-        pg2.set_property("height-request",15)
+        pg2.set_border_width(5)
+        pg2.set_property("width-request", 300)
+        #pg2.set_property("height-request",150)
+        larg1=90
         
         h=Gtk.Box(spacing=10)
         rdLocale = Gtk.RadioButton.new_with_label_from_widget(None, "Locale")
-        rdLocale.connect("toggled", self.on_rd_toggled, "1")
-        #pg2.attach(rdLocale,0,0,1,1)       
-        #pg2.attach(Gtk.Entry(text="locale"),1,0,1,1)
-        h.add(rdLocale)
-        h.add(Gtk.Entry(text="locale"))
-        button = Gtk.Button.new_with_mnemonic("Nuovo")
-        button.set_property("width-request", 85)
-        button.set_property("height-request",15)
-        h.add(button)
+        rdLocale.set_property("width-request", larg1)
+        rdLocale.connect("toggled", self.on_rd_toggled, "loc")
+        h.pack_start(rdLocale,True,True,0)
+        #h.add(rdLocale)
+        #pg2.attach(rdLocale,0,0,1,1)
+        
+        self.txtLocPath=Gtk.Entry(text="",editable=False)
+        self.txtLocPath.set_property("max-width-chars", 35)
+        h.pack_start(self.txtLocPath,True,True,0)
+        #h.add(locPath)
+        #pg2.attach(locPath,1,0,2,1)
+        self.btLocPath = Gtk.Button.new_with_mnemonic("Nuovo")
+        self.btLocPath.set_property("width-request", 25)
+        self.btLocPath.set_property("height-request",15)
+        h.pack_start(self.btLocPath,False,True,0)
+        #h.add(button)
         #button.connect("clicked", self.on_nuovo_clicked)
-        #pg2.attach(button,2,0,1,1)
+        #pg2.attach(button,3,0,1,1)
         pg2.attach(h,0,0,1,1)
         
+        l=Gtk.HSeparator()
+        l.set_property("height-request",10)
+        l.set_property("margin",10)
+        pg2.attach(l,0,1,4,1)
+        
         h=Gtk.Box(spacing=10)
-        rdRemoto = Gtk.RadioButton.new_with_label_from_widget(rdLocale, "Remoto")
-        rdRemoto.connect("toggled", self.on_rd_toggled, "2")
-        #pg2.attach(rdRemoto,0,1,1,1)       
-        #pg2.attach(Gtk.Label(label="Utente"),1,1,1,1)
-        h.add(rdRemoto)
-        self.utente=Gtk.Entry(text="")
+        self.rdRemoto = Gtk.RadioButton.new_with_label_from_widget(rdLocale, "Remoto")
+        self.rdRemoto.set_property("width-request", larg1)
+        #rdRemoto.connect("toggled", self.on_rd_toggled, "2")
+        h.add(self.rdRemoto)
+        h.add(Gtk.Label(label="Host",width_request=50,xalign=1))
+        self.txtHost=Gtk.Entry(text="")
         #pg2.attach(self.utente,2,1,1,1)
-        h.add(self.utente)
-        pg2.attach(h,0,1,1,1)
+        h.add(self.txtHost)
+        pg2.attach(h,0,2,1,1)
+        
+        h=Gtk.Box(spacing=10)
+        h.add(Gtk.Label(label="",width_request=larg1))
+        h.add(Gtk.Label(label="Utente",width_request=50,xalign=1))
+        self.txtUtente=Gtk.Entry(text="")
+        h.add(self.txtUtente)
+        pg2.attach(h,0,3,1,1)
+        
+        h=Gtk.Box(spacing=10)
+        h.add(Gtk.Label(label="",width_request=larg1))
+        h.add(Gtk.Label(label="Path",width_request=50,xalign=1))
+        self.txtRemPath=Gtk.Entry(text="",max_width_chars=35)
+        #self.txtRemPath.set_property("max-width-chars", 35)
+        h.add(self.txtRemPath)
+        pg2.attach(h,0,4,1,1)
+        
         self.nb.append_page(pg2,Gtk.Label(label="ORIGINE"))
+        
+        self.__initOrigine()
+    def __initOrigine(self):
+	    if self.bk['dirDA']['remoto']==True:
+		    self.rdRemoto.set_active(True)
+		    i=self.bk['dirDA']['da'].find("@")
+		    if i!=-1:
+			    self.txtUtente.set_text(self.bk['dirDA']['da'][:i])
+			    ii=self.bk['dirDA']['da'].find(":")
+			    if ii!=-1:
+				    self.txtHost.set_text(self.bk['dirDA']['da'][i+1:ii])
+				    self.txtRemPath.set_text(self.bk['dirDA']['da'][ii+1:])
     def on_rd_toggled(self,rd,name):
 	    if rd.get_active():
-		    state = "on"
+		    self.btLocPath.set_sensitive(True)
+		    self.txtHost.set_editable(False)
+		    self.txtUtente.set_editable(False)
+		    self.txtRemPath.set_editable(False)
 	    else:
-		    state = "off"
-	    print("Button", name, "was turned", state)		
+		    self.btLocPath.set_sensitive(False)
+		    self.txtHost.set_editable(True)
+		    self.txtUtente.set_editable(True)
+		    self.txtRemPath.set_editable(True)
+	    
 #******************************************************************
     def __primaPagina(self):
         #prima pagina
