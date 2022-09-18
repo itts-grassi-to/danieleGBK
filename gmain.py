@@ -3,6 +3,7 @@
 
 import gi
 import ast
+from motore_backup import *
 from dlgConfigurazione import *
 
 gi.require_version("Gtk", "3.0")
@@ -30,6 +31,8 @@ class MainW(Gtk.Window):
         grid.attach(self.__attach_button(), 0, 1, 1, 1)
 
         self.add(grid)
+
+        self.th = MotoreBackup(self.fconf)
 
     def __attach_button(self):
         hbox2 = Gtk.Box(spacing=6)
@@ -81,16 +84,22 @@ class MainW(Gtk.Window):
         # lbl = Gtk.Label(label="T")
         row = self.lstMain.get_selected_row()
         # print(self.lst_lbl[row.get_index()].get_text())
-        print (self.lst_chiavi[row.get_index()])
-        w = DlgConf(self.fconf,self.lst_chiavi[row.get_index()])
+        print(self.lst_chiavi[row.get_index()])
+        w = DlgConf(self.fconf, self.lst_chiavi[row.get_index()])
         w.connect("destroy", Gtk.main_quit)
         w.set_modal(True)
         w.show_all()
         Gtk.main()
 
 
+    def fine(self):
+        print("hofinito")
+        self.th.thFine=True
+        Gtk.main_quit()
+
+
 win = MainW()
 
-win.connect("destroy", Gtk.main_quit)
+win.connect("destroy", MainW.fine)
 win.show_all()
 Gtk.main()
