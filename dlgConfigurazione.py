@@ -7,6 +7,8 @@ import ast
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+# from motore_backup import MotoreBackup
+
 
 class Msg(Gtk.Dialog):
     def __init__(self, parent):
@@ -128,14 +130,18 @@ class DlgNuovo(Gtk.Window):
 
 
 class DlgConf(Gtk.Window):
-    def __init__(self,fconf, chDiz):
+    # def __init__(self, fconf, chDiz, th):
+    def __init__(self, parent):
         super().__init__(title="Configurazione backups")
-        print(chDiz)
-        with open(fconf, "r") as data:
-            self.bk = ast.literal_eval(data.read())['bks'][chDiz]
+        # print(chDiz)
+        self.fconf = parent.fconf
+        self.chDiz = parent.lst_chiavi[parent.lstMain.get_selected_row().get_index()]
+        self.parent=parent
+        with open(self.fconf, "r") as data:
+            self.bks = ast.literal_eval(data.read())
             data.close()
-        #self.bk = diz
-        print(self.bk)
+        self.bk = self.bks['bks'][self.chDiz]
+        # print(self.bk)
         self.set_default_size(800, 300)
         self.set_border_width(10)
         box = Gtk.Grid()
@@ -218,7 +224,7 @@ class DlgConf(Gtk.Window):
         self.__init_origine_to()
 
     def __init_origine_to(self):
-        if self.bk['dirTO']['remotoTO'] :
+        if self.bk['dirTO']['remoto']:
             self.rdRemotoTO.set_active(True)
             i = self.bk['dirTO']['to'].find("@")
             if i != -1:
@@ -227,6 +233,8 @@ class DlgConf(Gtk.Window):
                 if ii != -1:
                     self.txtHostTO.set_text(self.bk['dirTO']['to'][i + 1:ii])
                     self.txtRemPathTO.set_text(self.bk['dirTO']['to'][ii + 1:])
+        else:
+            self.txtLocPathTO.set_text(self.bk['dirTO']['to'])
 
     def on_rd_toggled_to(self, rd, name):
         if rd.get_active():
@@ -257,9 +265,9 @@ class DlgConf(Gtk.Window):
         # h.add(rdLocale)
         # pg2.attach(rdLocale,0,0,1,1)
 
-        self.txtLocPath = Gtk.Entry(text="", editable=False)
-        self.txtLocPath.set_property("max-width-chars", 80)
-        h.pack_start(self.txtLocPath, True, True, 0)
+        self.txtLocPathDA = Gtk.Entry(text="", editable=False)
+        self.txtLocPathDA.set_property("max-width-chars", 80)
+        h.pack_start(self.txtLocPathDA, True, True, 0)
         # h.add(locPath)
         # pg2.attach(locPath,1,0,2,1)
         self.btLocPath = Gtk.Button.new_with_mnemonic("---")
@@ -277,57 +285,58 @@ class DlgConf(Gtk.Window):
         pg2.attach(l, 0, 1, 4, 1)
 
         h = Gtk.Box(spacing=10)
-        self.rdRemoto = Gtk.RadioButton.new_with_label_from_widget(rdLocale, "Remoto")
-        self.rdRemoto.set_property("width-request", larg1)
-        # rdRemoto.connect("toggled", self.on_rd_toggled, "2")
-        h.add(self.rdRemoto)
+        self.rdRemotoDA = Gtk.RadioButton.new_with_label_from_widget(rdLocale, "Remoto")
+        self.rdRemotoDA.set_property("width-request", larg1)
+        # rdRemotoDA.connect("toggled", self.on_rd_toggled, "2")
+        h.add(self.rdRemotoDA)
         h.add(Gtk.Label(label="Host", width_request=50, xalign=1))
-        self.txtHost = Gtk.Entry(text="")
+        self.txtHostDA = Gtk.Entry(text="")
         # pg2.attach(self.utente,2,1,1,1)
-        h.add(self.txtHost)
+        h.add(self.txtHostDA)
         pg2.attach(h, 0, 2, 1, 1)
 
         h = Gtk.Box(spacing=10)
         h.add(Gtk.Label(label="", width_request=larg1))
         h.add(Gtk.Label(label="Utente", width_request=50, xalign=1))
-        self.txtUtente = Gtk.Entry(text="")
-        h.add(self.txtUtente)
+        self.txtUtenteDA = Gtk.Entry(text="")
+        h.add(self.txtUtenteDA)
         pg2.attach(h, 0, 3, 1, 1)
 
         h = Gtk.Box(spacing=10)
         h.add(Gtk.Label(label="", width_request=larg1))
         h.add(Gtk.Label(label="Path", width_request=50, xalign=1))
-        self.txtRemPath = Gtk.Entry(text="", max_width_chars=80)
-        # self.txtRemPath.set_property("max-width-chars", 35)
-        h.add(self.txtRemPath)
+        self.txtRemPathDA = Gtk.Entry(text="", max_width_chars=80)
+        # self.txtRemPathDA.set_property("max-width-chars", 35)
+        h.add(self.txtRemPathDA)
         pg2.attach(h, 0, 4, 1, 1)
 
         self.nb.append_page(pg2, Gtk.Label(label="ORIGINE"))
 
-        self.__init_origine()
+        self.__init_origineDA()
 
-    def __init_origine(self):
-        if self.bk['dirDA']['remoto'] :
-            self.rdRemoto.set_active(True)
+    def __init_origineDA(self):
+        if self.bk['dirDA']['remoto']:
+            self.rdRemotoDA.set_active(True)
             i = self.bk['dirDA']['da'].find("@")
             if i != -1:
-                self.txtUtente.set_text(self.bk['dirDA']['da'][:i])
+                self.txtUtenteDA.set_text(self.bk['dirDA']['da'][:i])
                 ii = self.bk['dirDA']['da'].find(":")
                 if ii != -1:
-                    self.txtHost.set_text(self.bk['dirDA']['da'][i + 1:ii])
-                    self.txtRemPath.set_text(self.bk['dirDA']['da'][ii + 1:])
-
+                    self.txtHostDA.set_text(self.bk['dirDA']['da'][i + 1:ii])
+                    self.txtRemPathDA.set_text(self.bk['dirDA']['da'][ii + 1:])
+        else:
+            self.txtLocPathDA.set_text(self.bk['dirDA']['da'])
     def on_rd_toggled(self, rd, name):
         if rd.get_active():
             self.btLocPath.set_sensitive(True)
-            self.txtHost.set_editable(False)
-            self.txtUtente.set_editable(False)
-            self.txtRemPath.set_editable(False)
+            self.txtHostDA.set_editable(False)
+            self.txtUtenteDA.set_editable(False)
+            self.txtRemPathDA.set_editable(False)
         else:
             self.btLocPath.set_sensitive(False)
-            self.txtHost.set_editable(True)
-            self.txtUtente.set_editable(True)
-            self.txtRemPath.set_editable(True)
+            self.txtHostDA.set_editable(True)
+            self.txtUtenteDA.set_editable(True)
+            self.txtRemPathDA.set_editable(True)
 
     # *************************** GENERALE *****************************
     def __prima_pagina(self):
@@ -355,7 +364,7 @@ class DlgConf(Gtk.Window):
         return hbox2
 
     def on_folder_clicked(self, widget):
-        #print(widget.get_label())
+        # print(widget.get_label())
         dialog = Gtk.FileChooserDialog(
             title="Please choose a folder",
             parent=self,
@@ -368,13 +377,13 @@ class DlgConf(Gtk.Window):
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            if widget.get_label()=="---":
-                #print("Select clicked")
-                #print("Folder selected: " + dialog.get_filename())
-                self.txtLocPath.set_text(dialog.get_filename())
-            elif widget.get_label()=="----":
+            if widget.get_label() == "---":
+                # print("Select clicked")
+                # print("Folder selected: " + dialog.get_filename())
+                self.txtLocPathDA.set_text(dialog.get_filename())
+            elif widget.get_label() == "----":
                 self.txtLocPathTO.set_text(dialog.get_filename())
-        #elif response == Gtk.ResponseType.CANCEL:
+        # elif response == Gtk.ResponseType.CANCEL:
         #    print("Cancel clicked")
 
         dialog.destroy()
@@ -382,8 +391,45 @@ class DlgConf(Gtk.Window):
     def on_annulla_clicked(self):
         printf("Annulla")
 
-    def on_salva_clicked(self):
-        print("salva")
+    def __salva_origine(self):
+        #print("salva origine")
+        print(self.bks)
+        if self.rdRemotoDA.get_active():
+            self.bk['dirDA']['remoto'] = True
+            self.bk['dirDA']['da'] = \
+                str(self.txtUtenteDA.get_text()) + "@" \
+                + str(self.txtHostDA.get_text()) + ":" \
+                + str(self.txtRemPathDA.get_text())
+
+        else:
+            self.bk['dirDA']['remoto'] = False
+            self.bk['dirDA']['da'] = self.txtLocPathDA.get_text()
+    def __salvaDestinatario(self):
+        if self.rdRemotoTO.get_active():
+            self.bk['dirTO']['remoto'] = True
+            self.bk['dirTO']['to'] = \
+                str(self.txtUtenteTO.get_text()) + "@" \
+                + str(self.txtHostTO.get_text()) + ":" \
+                + str(self.txtRemPathTO.get_text())
+        else:
+            self.bk['dirTO']['remoto'] = False
+            self.bk['dirTO']['to'] = self.txtLocPathTO.get_text()
+
+    def __salvaTutto(self):
+        # print(self.chDiz)
+        self.__salva_origine()
+        self.__salvaDestinatario()
+        with open(self.fconf, "w") as data:
+            data.write(str(self.bks))
+            data.close()
+        print(self.bks)
+        self.parent.set_restart_impostazioni()
+        msg = Msg(self)
+        msg.set_msg("Salvato HO")
+
+    def on_salva_clicked(self, widget):
+        # print("salva")
+        self.__salvaTutto()
 
 
 def getImpostazioni(f):
@@ -393,8 +439,8 @@ def getImpostazioni(f):
         return d
 
 
-#win = DlgConf(getImpostazioni("./danieleBK.conf")['chDef'])
-#win = DlgConf("./danieleBK.conf","chDef")
+# win = DlgConf(getImpostazioni("./danieleBK.conf")['chDef'])
+#win = DlgConf("./danieleBK.conf", "chDef")
 #win.connect("destroy", Gtk.main_quit)
 #win.show_all()
 #Gtk.main()

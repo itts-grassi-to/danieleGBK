@@ -3,19 +3,23 @@
 
 import gi
 import ast
-from motore_backup import *
-from dlgConfigurazione import *
+
+from dlgConfigurazione import DlgNuovo, DlgConf
+from motore_backup import MotoreBackup
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 
-class MainW(Gtk.Window):
+class MainW(Gtk.Window, MotoreBackup):
+
+
     def __init__(self):
-        super().__init__(title="DANIELE BACKUP")
+        Gtk.Window.__init__(self, title="DANIELE BACKUP")
+        MotoreBackup.__init__(self)
         self.set_default_size(500, 300)
         self.set_border_width(20)
-        self.fconf = "./danieleBK.conf"
+        # self.fconf = "./danieleBK.conf"
         self.bks = self.__get_impostazioni(self.fconf)['bks']
         # print(self.bks)
         self.lst_lbl = []
@@ -32,7 +36,7 @@ class MainW(Gtk.Window):
 
         self.add(grid)
 
-        self.th = MotoreBackup(self.fconf)
+        # self.th = MotoreBackup(self.fconf)
 
     def __attach_button(self):
         hbox2 = Gtk.Box(spacing=6)
@@ -69,7 +73,6 @@ class MainW(Gtk.Window):
             d = ast.literal_eval(data.read())
             data.close()
             return d
-
     def on_nuovo_clicked(self, bt):
         # print("NUOVO")
 
@@ -82,10 +85,11 @@ class MainW(Gtk.Window):
 
     def on_modifica_clicked(self, bt):
         # lbl = Gtk.Label(label="T")
-        row = self.lstMain.get_selected_row()
+        # row = self.lstMain.get_selected_row()
         # print(self.lst_lbl[row.get_index()].get_text())
-        print(self.lst_chiavi[row.get_index()])
-        w = DlgConf(self.fconf, self.lst_chiavi[row.get_index()])
+        # print(self.lst_chiavi[row.get_index()])
+        # w = DlgConf(self.fconf, self.lst_chiavi[row.get_index()], )
+        w = DlgConf(self)
         w.connect("destroy", Gtk.main_quit)
         w.set_modal(True)
         w.show_all()
@@ -94,9 +98,8 @@ class MainW(Gtk.Window):
 
     def fine(self):
         print("hofinito")
-        self.th.thFine=True
+        self.thFine=True
         Gtk.main_quit()
-
 
 win = MainW()
 
