@@ -1,9 +1,13 @@
 .gitignore
 __pycache__/
 .idea/
+chBDA/
+chBTO/
+uffTO/
 NAS.log
 danieleBK.conf.ori
 provaDLG.py
 NAS.json
 danieleBK.conf
 *.log
+provaLista.py

@@ -34,7 +34,7 @@ class bkFile():
                 self._flog.write("\nDirectory montata")
             else:
                 self._flog.write("\nDirectory GIA montata")
-            self._dirDA = self._dirBASE + "/" + self._dirDA["mnt"]
+            self._dirDA = self._dirBASE + "/" + self._mntDA
         if self._remotoTO:
             self._flog.write("\nMonto directory dei backup: " + self._dirBK)
             if not self.isMount(self._dirBK):
