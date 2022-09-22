@@ -53,7 +53,15 @@ class MotoreBackup(bkFile):
         # print("Giorno: " + dnow.strftime("%d"))
         # print("Mese: " + dnow.strftime("%m"))
         # print("Settimana: " + dnow.strftime("%w"))
+    def thread_backup(self,bf, ch, bks):
+        print("thread rsync")
 
+        bf.backuppaRSYNK()
+        # time.sleep(60)
+        #print("backup finito**********************************************")
+        bks[ch]['attivo'] = True
+
+    # bks[ch]['attivo'] = True
     def thread_function(self, fconf):
         st = True
         stesso_minuto = {}
@@ -68,17 +76,19 @@ class MotoreBackup(bkFile):
                     stesso_minuto[ch] = ""
                 if bks[ch]['attivo']:
                     x = datetime.datetime.now()
+                    # print(ch, "-----", bks[ch]['attivo'])
                     if self.__startBK(x, bks[ch]['cron']):
-                        print(str(x)[14:16])
-                        print("thread_function: seleziono backup")
-                        print("thread_function: stesso_minuto["+ch+"]= "+ stesso_minuto[ch])
+                        # print(str(x)[14:16])
+                        # print("thread_function: seleziono backup")
+                        # print("thread_function: stesso_minuto["+ch+"]= "+ stesso_minuto[ch])
                         if bks[ch]['attivo'] and stesso_minuto[ch] != str(x)[14:16] :
                             stesso_minuto[ch] = str(x)[14:16]
                             bks[ch]['attivo']=False
                             print("thread_function: backuppo : " + ch)
                             bf = bkFile(ch, bks)
-                            bf.backuppaRSYNK()
-                            bks[ch]['attivo']=True
+                            #bf.backuppaRSYNK()
+                            threading.Thread(target=self.thread_backup, args=(bf, ch, bks,)).start()
+                            #bks[ch]['attivo'] = True
 
             time.sleep(2)
 

@@ -3,7 +3,7 @@
 
 import gi
 import ast
-
+import os
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
@@ -102,7 +102,16 @@ class DlgNuovo(Gtk.Window):
 
     def __salvaNuovo(self, ch, titolo):
         # print("salvaNuovo")
-        self.bks[ch] = {'titolo': titolo}
+        # self.bks['bks'] = ch
+        self.bks['bks'][ch] = {
+                'attivo': True ,'titolo': titolo,
+                'dirDA': {'remoto': False, 'da': '', 'mnt': ch+"DA"},
+                'dirTO': {'remoto': False, 'to': '', 'mnt': ch+"TO"},
+                'cron': {'minuto': '1', 'ora': '0', 'giorno': '1', 'mese': '1', 'settimana': [1, 2]}
+            }
+
+        os.system("mkdir -p "+self.bks['bks'][ch]['dirDA']['mnt'])
+        os.system("mkdir -p "+self.bks['bks'][ch]['dirTO']['mnt'])
         with open(self.fconf, "w") as data:
             data.write(str(self.bks))
             data.close()
@@ -388,8 +397,9 @@ class DlgConf(Gtk.Window):
 
         dialog.destroy()
 
-    def on_annulla_clicked(self):
-        printf("Annulla")
+    def on_annulla_clicked(self, widg):
+        print("Annulla")
+        self.destroy()
 
     def __salva_origine(self):
         #print("salva origine")
@@ -400,7 +410,6 @@ class DlgConf(Gtk.Window):
                 str(self.txtUtenteDA.get_text()) + "@" \
                 + str(self.txtHostDA.get_text()) + ":" \
                 + str(self.txtRemPathDA.get_text())
-
         else:
             self.bk['dirDA']['remoto'] = False
             self.bk['dirDA']['da'] = self.txtLocPathDA.get_text()
@@ -419,6 +428,7 @@ class DlgConf(Gtk.Window):
         # print(self.chDiz)
         self.__salva_origine()
         self.__salvaDestinatario()
+
         with open(self.fconf, "w") as data:
             data.write(str(self.bks))
             data.close()

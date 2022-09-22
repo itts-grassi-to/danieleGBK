@@ -82,6 +82,8 @@ class MainW(Gtk.Window, MotoreBackup):
         w.show_all()
         Gtk.main()
         print("fine nuovo")
+        self.bks = self.__get_impostazioni(self.fconf)['bks']
+        self.lstMain.add(self.__attach_lista())
 
     def on_modifica_clicked(self, bt):
         # lbl = Gtk.Label(label="T")

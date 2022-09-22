@@ -20,10 +20,10 @@ class bkFile():
         self.initOK = True
         # self.__f=f
         # self.__nomeTAR = ""
-        self.__flog = f = open(self._fileLOG, "w")
-        self.__flog.write("Inizio processo di backup")
+        self._flog = f = open(self._fileLOG, "w")
+        self._flog.write("Inizio processo di backup")
         if self._remotoDA:
-            self.__flog.write("\nMonto directory da backuppare: " + self._dirDA)
+            self._flog.write("\nMonto directory da backuppare: " + self._dirDA)
             if not self.isMount(self._dirDA):
                 r = subprocess.run(["sshfs", self._dirDA, self._dirBASE + "/" + self._mntDA],
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -31,12 +31,12 @@ class bkFile():
                     self.__log("\nERRORE: " + r.stderr.decode("utf-8"), True)
                     self.initOK = False
                     return
-                self.__flog.write("\nDirectory montata")
+                self._flog.write("\nDirectory montata")
             else:
-                self.__flog.write("\nDirectory GIA montata")
+                self._flog.write("\nDirectory GIA montata")
             self._dirDA = self._dirBASE + "/" + self._dirDA["mnt"]
         if self._remotoTO:
-            self.__flog.write("\nMonto directory dei backup: " + self._dirBK)
+            self._flog.write("\nMonto directory dei backup: " + self._dirBK)
             if not self.isMount(self._dirBK):
                 r = subprocess.run(["sshfs", self._dirBK, self._dirBASE + "/" + self._mntTO], stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -44,11 +44,13 @@ class bkFile():
                     self.__log("\nERRORE: " + r.stderr.decode("utf-8"), True)
                     self.initOK = False
                     return
-                self.__flog.write("\nDirectory montata")
+                self._flog.write("\nDirectory montata")
             else:
-                self.__flog.write("\nDirectory GIA montata")
-            self._dirBK = self._dirBASE + "/mntBK"
-        self.__flog.write("Fine inizializzazione processo")
+                self._flog.write("\nDirectory GIA montata")
+            self._dirBK = self._dirBASE + "/" + self._mntTO
+
+            self._latestDIR = self._dirBK + "/" + "latestDIR"+self._mntTO
+        self._flog.write("\nFine inizializzazione processo")
 
     def __inizializza_backup(self, ch, bks):
         data = bks[ch]
@@ -59,7 +61,7 @@ class bkFile():
         self._dirDA = data['dirDA']["da"]
         self._dirBK = data['dirTO']["to"]
         self._mntDA = data['dirDA']["mnt"]
-        self._mntTO = data['dirTO']["mnt"]
+        self._mntTO =  data['dirTO']["mnt"]
         # self._tmp = data["dirTMP"]
         self._nome = ch
         # self._maxBK = data["maxBK"]
@@ -77,19 +79,19 @@ class bkFile():
         return sub in str(r.stdout)
 
     def __log(self, msg, mail):
-        self.__flog.write(msg)
-        self.__flog.close()
+        self._flog.write(msg)
+        self._flog.close()
         if mail:
             dummy = 0
             #os.system("mail -s  '" + self._nome + "' server.backup@itisgrassi.edu.it < " + self._fileLOG)
 
     def backuppaRSYNK(self):
-        self.__flog.write("\n*********Inizio il processo di backup************")
+        self._flog.write("\n*********Inizio il processo di backup************")
         # print("*************************************"+self._do)
-        self.__flog.write("\nUso come base: " + self._latestDIR)
+        self._flog.write("\nUso come base: " + self._latestDIR)
         attr = '-auv --link-dest "' + self._latestDIR + '" --exclude=".cache" '
-        print(
-            "rsync " + attr + self._dirDA + "/ " + self._dirBK + "/" + self._do + "-" + self._nome + " > " + self._fileLOG)
+        self._flog.write(
+            "rsync " + attr + "\n\t" + self._dirDA + "/\n\t" + self._dirBK + "/" + self._do + "-" + self._nome + " > " + self._fileLOG)
         r = os.system(
             "rsync " + attr + self._dirDA + "/ " + self._dirBK + "/" + self._do + "-" + self._nome + " > " + self._fileLOG)
         # r=subprocess.run(["rsync",attr+self._dirDA+"/ "+ self._dirBK+"/"+self._do+"-"+self._nome],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -97,12 +99,13 @@ class bkFile():
         #    self.__log("\nERRORE: "+r.stderr.decode("utf-8"),True)
         # self.initOK=False
         #    return
-        self.__flog.close()
-        self.__flog = f = open(self._fileLOG, "a")
-        self.__flog.write("\nRimuovuo: " + self._latestDIR)
+        self._flog.close()
+        self._flog = f = open(self._fileLOG, "a")
+        self._flog.write("\nRimuovuo: " + self._latestDIR)
         r = os.system("rm -rf " + self._latestDIR)
         # print("\n"+r)
-        self.__flog.write("\nNuova base: " + self._dirBK + "/" + self._do + "-" + self._nome)
+        self._flog.write("\nNuova base: " + self._dirBK + "/" + self._do + "-" + self._nome)
+        self._flog.write("\nCreo link: ln -s " + self._dirBK + "/" + self._do + "-" + self._nome + " " + self._latestDIR)
         r = os.system("ln -s " + self._dirBK + "/" + self._do + "-" + self._nome + " " + self._latestDIR)
         # print("\n"+r)
 
