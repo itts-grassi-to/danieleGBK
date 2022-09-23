@@ -141,7 +141,6 @@ class DlgNuovo(Gtk.Window):
 class DlgConf(Gtk.Window):
     # def __init__(self, fconf, chDiz, th):
     def __init__(self, parent):
-        super().__init__(title="Configurazione backups")
         # print(chDiz)
         self.fconf = parent.fconf
         self.chDiz = parent.lst_chiavi[parent.lstMain.get_selected_row().get_index()]
@@ -151,6 +150,7 @@ class DlgConf(Gtk.Window):
             data.close()
         self.bk = self.bks['bks'][self.chDiz]
         # print(self.bk)
+        super().__init__(title="MODIFICA I PARAMETRI DI BACKUP DI " + self.bk['titolo'])
         self.set_default_size(800, 300)
         self.set_border_width(10)
         box = Gtk.Grid()
@@ -350,12 +350,77 @@ class DlgConf(Gtk.Window):
     # *************************** GENERALE *****************************
     def __prima_pagina(self):
         # prima pagina
-        self.generale = Gtk.Grid()
-        self.generale.set_border_width(10)
-        self.generale.attach(Gtk.Label(label=self.bk['titolo']), 0, 0, 1, 1)
-        self.nb.append_page(self.generale, Gtk.Label(label="GENERALE"))
 
-    # ******************************************************************
+        self.generale = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)# Gtk.Grid(spacing=10)
+        self.generale.set_border_width(15)
+        # ************************** minuti cron
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=20)
+        lbl = Gtk.Label(label='MIN')
+        vbox.pack_start(lbl, False, True, 0)
+        self.txtCronGiorno = Gtk.Entry(text=self.bk['cron']['minuto'], editable=True, max_length=2)
+        self.txtCronGiorno.set_width_chars(2)
+        vbox.pack_start(self.txtCronGiorno, False, True, 0)
+        # self.generale.attach(vbox, 0, 0, 1, 1)
+        self.generale.add(vbox)
+        # ************************** ore cron
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=20)
+        lbl = Gtk.Label(label='ORA')
+        vbox.pack_start(lbl, False, True, 0)
+        self.txtCronOra = Gtk.Entry(text=self.bk['cron']['ora'], editable=True, max_length=2)
+        self.txtCronOra.set_width_chars(2)
+        vbox.pack_start(self.txtCronOra, False, True, 0)
+        self.generale.add(vbox)
+        # ************************** giorno cron
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        lbl = Gtk.Label(label='GIO')
+        vbox.pack_start(lbl, False, True, 0)
+        self.txtCronGiorno = Gtk.Entry(text=self.bk['cron']['giorno'], editable=True, max_length=2)
+        self.txtCronGiorno.set_width_chars(2)
+        vbox.pack_start(self.txtCronGiorno, False, True, 0)
+        self.generale.add(vbox)
+        # ************************** mese cron
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        lbl = Gtk.Label(label='MESE')
+        vbox.pack_start(lbl, False, True, 0)
+        self.txtCronMese = Gtk.Entry(text=self.bk['cron']['mese'], editable=True, max_length=2)
+        self.txtCronMese.set_width_chars(2)
+        vbox.pack_start(self.txtCronMese, False, True, 0)
+        self.generale.add(vbox)
+        # ************************** settimana cron
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        lbl = Gtk.Label(label='SETTIMANA')
+        vbox.pack_start(lbl, False, True, 0)
+        self.txtCronSettimanaLun = Gtk.CheckButton(label='Lunedì')
+        self.txtCronSettimanaLun.set_active(self.__is_active(1))
+        vbox.pack_start(self.txtCronSettimanaLun, False, True, 0)
+        self.txtCronSettimanaMar = Gtk.CheckButton(label='Martedì')
+        self.txtCronSettimanaMar.set_active(self.__is_active(2))
+        vbox.pack_start(self.txtCronSettimanaMar, False, True, 0)
+        self.txtCronSettimanaMer = Gtk.CheckButton(label='Mercoledì')
+        self.txtCronSettimanaMer.set_active(self.__is_active(3))
+        vbox.pack_start(self.txtCronSettimanaMer, False, True, 0)
+        self.txtCronSettimanaGio = Gtk.CheckButton(label='Giovedì')
+        self.txtCronSettimanaGio.set_active(self.__is_active(4))
+        vbox.pack_start(self.txtCronSettimanaGio, False, True, 0)
+        self.txtCronSettimanaVen = Gtk.CheckButton(label='Venerdì')
+        self.txtCronSettimanaVen.set_active(self.__is_active(5))
+        vbox.pack_start(self.txtCronSettimanaVen, False, True, 0)
+        self.txtCronSettimanaSab = Gtk.CheckButton(label='Sabato')
+        self.txtCronSettimanaSab.set_active(self.__is_active(6))
+        vbox.pack_start(self.txtCronSettimanaSab, False, True, 0)
+        self.txtCronSettimanaDom = Gtk.CheckButton(label='Domenica')
+        self.txtCronSettimanaDom.set_active(self.__is_active(7))
+        vbox.pack_start(self.txtCronSettimanaDom, False, True, 0)
+        self.generale.add(vbox)
+        # ******************************************************************
+
+        self.nb.append_page(self.generale, Gtk.Label(label="GENERALE"))
+    def __is_active(self, giorno):
+
+        if self.bk['cron']['settimana'] == '*':
+            return True
+        return giorno in self.bk['cron']['settimana']
+
 
     def __attach_button(self):
         hbox2 = Gtk.Box(spacing=6)
