@@ -33,16 +33,17 @@ class Msg(Gtk.Dialog):
 
 
 class DlgNuovo(Gtk.Window):
-    def __init__(self, fconf):
+    def __init__(self, parent):
         super().__init__(title="Nuovo backups")
-        self.fconf = fconf
-        with open(self.fconf, "r") as data:
-            self.bks = ast.literal_eval(data.read())
-            data.close()
-
-        # print(self.bks)
+        # self.fconf = fconf
+        # with open(self.fconf, "r") as data:
+        #    self.bks = ast.literal_eval(data.read())
+        #    data.close()
         self.set_default_size(400, 300)
         # self.set_border_width(10)
+
+        self.parent = parent
+        print(self.parent.bks)
         grid = Gtk.Grid()
 
         lbl = Gtk.Label(label="Inserisci codice")
@@ -98,24 +99,23 @@ class DlgNuovo(Gtk.Window):
 
     def __esisteCodice(self, s):
         # print("esisteCodice")
-        return s in self.bks
+        return s in self.parent.bks['bks']
 
     def __salvaNuovo(self, ch, titolo):
         # print("salvaNuovo")
         # self.bks['bks'] = ch
-        self.bks['bks'][ch] = {
+        self.parent.bks['bks'][ch] = {
                 'attivo': True ,'titolo': titolo,
                 'dirDA': {'remoto': False, 'da': '', 'mnt': ch+"DA"},
                 'dirTO': {'remoto': False, 'to': '', 'mnt': ch+"TO"},
                 'cron': {'minuto': '1', 'ora': '0', 'giorno': '1', 'mese': '1', 'settimana': [1, 2]}
             }
-
-        os.system("mkdir -p "+self.bks['bks'][ch]['dirDA']['mnt'])
-        os.system("mkdir -p "+self.bks['bks'][ch]['dirTO']['mnt'])
-        with open(self.fconf, "w") as data:
-            data.write(str(self.bks))
+        self.parent.lst_chiavi.append(ch)
+        os.system("mkdir -p "+self.parent.bks['bks'][ch]['dirDA']['mnt'])
+        os.system("mkdir -p "+self.parent.bks['bks'][ch]['dirTO']['mnt'])
+        with open(self.parent.fconf, "w") as data:
+            data.write(str(self.parent.bks))
             data.close()
-
     def on_annulla_clicked(self, bt):
         # print("annulla")
         self.destroy()
