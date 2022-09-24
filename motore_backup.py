@@ -32,19 +32,19 @@ class MotoreBackup(bkFile):
 
     def __startBK(self, dnow, cron):
         if cron['minuto'] != "*":
-            if dnow.strftime("%M") != cron['minuto']:
+            if int(dnow.strftime("%M")) != int(cron['minuto']):
                 return False
         if cron['ora'] != "*":
-            if dnow.strftime("%H") != cron['ora']:
+            if int(dnow.strftime("%H")) != int(cron['ora']):
                 return False
         if cron['giorno'] != "*":
-            if dnow.strftime("%d") != cron['giorno']:
+            if int(dnow.strftime("%d")) != int(cron['giorno']):
                 return False
         if cron['mese'] != "*":
-            if dnow.strftime("%m") != cron['mese']:
+            if int(dnow.strftime("%m")) !=int(cron['mese']):
                 return False
         if cron['settimana'] != "*":
-            if not (dnow.strftime("%w") in cron['settimana']):
+            if not (int(dnow.strftime("%w")) in cron['settimana']):
                 return False
 
         return True
@@ -76,9 +76,9 @@ class MotoreBackup(bkFile):
                     stesso_minuto[ch] = ""
                 if bks[ch]['attivo']:
                     x = datetime.datetime.now()
-                    # print(ch, "-----", bks[ch]['attivo'])
+                    print(ch, "-----", bks[ch]['attivo'], "--------------", self.__startBK(x, bks[ch]['cron']))
                     if self.__startBK(x, bks[ch]['cron']):
-                        # print(str(x)[14:16])
+                        print(str(x)[14:16])
                         # print("thread_function: seleziono backup")
                         # print("thread_function: stesso_minuto["+ch+"]= "+ stesso_minuto[ch])
                         if bks[ch]['attivo'] and stesso_minuto[ch] != str(x)[14:16] :
