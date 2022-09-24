@@ -412,6 +412,26 @@ class DlgConf(Gtk.Window):
         self.txtCronSettimanaDom.set_active(self.__is_active(7))
         vbox.pack_start(self.txtCronSettimanaDom, False, True, 0)
         self.generale.add(vbox)
+        # ************************** separatore
+        l = Gtk.VSeparator()
+        l.set_property("width-request", 10)
+        l.set_property("margin", 10)
+        self.generale.add(l)
+        # ************************** altro
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        hbox_mail = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        hbox_mail.pack_start(Gtk.Label(label='MAIL FROM', width_request=10), False, False, 0)
+        self.txtMailFrom=Gtk.Entry(text=self.bks['altro']['mailFROM'],  max_width_chars=40)
+        hbox_mail.pack_start(self.txtMailFrom, False, False, 0)
+        vbox.add(hbox_mail)
+
+        hbox_mail = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        hbox_mail.pack_start(Gtk.Label(label='        MAIL TO', width_request=10), False, False, 0)
+        self.txtMailTO=Gtk.Entry(text=self.bks['altro']['mailTO'],  max_width_chars=40)
+        hbox_mail.pack_start(self.txtMailTO, False, False, 0)
+        vbox.add(hbox_mail)
+
+        self.generale.add(vbox)
         # ******************************************************************
 
         self.nb.append_page(self.generale, Gtk.Label(label="GENERALE"))
