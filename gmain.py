@@ -44,7 +44,7 @@ class MainW(Gtk.Window, MotoreBackup):
         listbox.set_property("margin", 10)
         return listbox
     def __attach_rows(self,lst):
-        print("Backup: " + str(self.bks['bks']))
+        # print("Backup: " + str(self.bks['bks']))
         for chiave in self.bks['bks']:
             lst.add(self.__attach_row(chiave))
     def __attach_row(self, ch):
@@ -131,7 +131,7 @@ class MainW(Gtk.Window, MotoreBackup):
         Gtk.main()
         self.lstMain.add(self.__attach_row(self.lst_chiavi.pop()))
         self.show_all()
-        print("fine nuovo")
+        # print("fine nuovo")
         # self.bks = self.__get_impostazioni(self.fconf)
         # self.lstMain.add(self.__attach_lista())
 
@@ -144,7 +144,7 @@ class MainW(Gtk.Window, MotoreBackup):
 
 
     def fine(self):
-        print("hofinito")
+        # print("hofinito")
         self.thFine=True
         Gtk.main_quit()
 

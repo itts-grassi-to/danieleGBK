@@ -43,7 +43,7 @@ class DlgNuovo(Gtk.Window):
         # self.set_border_width(10)
 
         self.parent = parent
-        print(self.parent.bks)
+        # print(self.parent.bks)
         grid = Gtk.Grid()
 
         lbl = Gtk.Label(label="Inserisci codice")
@@ -483,7 +483,7 @@ class DlgConf(Gtk.Window):
         dialog.destroy()
 
     def on_annulla_clicked(self, widg):
-        print("Annulla")
+        # print("Annulla")
         self.destroy()
 
     def __salva_cron(self):
@@ -510,7 +510,7 @@ class DlgConf(Gtk.Window):
         self.bks['altro']['mailFROM'] = self.txtMailFrom.get_text()
         self.bks['altro']['mailTO'] = self.txtMailTO.get_text()
     def __salva_origine(self):
-        #print("salva origine")
+        # print("salva origine")
         # print(self.bks)
         if self.rdRemotoDA.get_active():
             self.bk['dirDA']['remoto'] = True
@@ -542,7 +542,7 @@ class DlgConf(Gtk.Window):
         with open(self.fconf, "w") as data:
             data.write(str(self.bks))
             data.close()
-        print(self.bks)
+        # print(self.bks)
         self.parent.set_restart_impostazioni()
         msg = Msg(self)
         msg.set_msg("Salvato HO")
