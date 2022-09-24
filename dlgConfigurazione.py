@@ -353,15 +353,6 @@ class DlgConf(Gtk.Window):
 
         self.generale = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)# Gtk.Grid(spacing=10)
         self.generale.set_border_width(15)
-        # ************************** minuti cron
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=20)
-        lbl = Gtk.Label(label='MIN')
-        vbox.pack_start(lbl, False, True, 0)
-        self.txtCronGiorno = Gtk.Entry(text=self.bk['cron']['minuto'], editable=True, max_length=2)
-        self.txtCronGiorno.set_width_chars(2)
-        vbox.pack_start(self.txtCronGiorno, False, True, 0)
-        # self.generale.attach(vbox, 0, 0, 1, 1)
-        self.generale.add(vbox)
         # ************************** ore cron
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=20)
         lbl = Gtk.Label(label='ORA')
@@ -369,6 +360,15 @@ class DlgConf(Gtk.Window):
         self.txtCronOra = Gtk.Entry(text=self.bk['cron']['ora'], editable=True, max_length=2)
         self.txtCronOra.set_width_chars(2)
         vbox.pack_start(self.txtCronOra, False, True, 0)
+        self.generale.add(vbox)
+        # ************************** minuti cron
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, width_request=20)
+        lbl = Gtk.Label(label='MIN')
+        vbox.pack_start(lbl, False, True, 0)
+        self.txtCronMinuto = Gtk.Entry(text=self.bk['cron']['minuto'], editable=True, max_length=2)
+        self.txtCronMinuto.set_width_chars(2)
+        vbox.pack_start(self.txtCronMinuto, False, True, 0)
+        # self.generale.attach(vbox, 0, 0, 1, 1)
         self.generale.add(vbox)
         # ************************** giorno cron
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -486,9 +486,32 @@ class DlgConf(Gtk.Window):
         print("Annulla")
         self.destroy()
 
+    def __salva_cron(self):
+        self.bk['cron']['minuto'] = self.txtCronMinuto.get_text()
+        self.bk['cron']['ora'] = self.txtCronOra.get_text()
+        self.bk['cron']['giorno'] = self.txtCronGiorno.get_text()
+        self.bk['cron']['mese'] = self.txtCronMese.get_text()
+        self.bk['cron']['settimana'] = []
+        if self.txtCronSettimanaDom.get_active():
+            self.bk['cron']['settimana'].append(0)
+        if self.txtCronSettimanaLun.get_active():
+            self.bk['cron']['settimana'].append(1)
+        if self.txtCronSettimanaMar.get_active():
+            self.bk['cron']['settimana'].append(2)
+        if self.txtCronSettimanaMer.get_active():
+            self.bk['cron']['settimana'].append(3)
+        if self.txtCronSettimanaGio.get_active():
+            self.bk['cron']['settimana'].append(4)
+        if self.txtCronSettimanaVen.get_active():
+            self.bk['cron']['settimana'].append(5)
+        if self.txtCronSettimanaSab.get_active():
+            self.bk['cron']['settimana'].append(6)
+    def __salva_altro(self):
+        self.bks['altro']['mailFROM'] = self.txtMailFrom.get_text()
+        self.bks['altro']['mailTO'] = self.txtMailTO.get_text()
     def __salva_origine(self):
         #print("salva origine")
-        print(self.bks)
+        # print(self.bks)
         if self.rdRemotoDA.get_active():
             self.bk['dirDA']['remoto'] = True
             self.bk['dirDA']['da'] = \
@@ -513,6 +536,8 @@ class DlgConf(Gtk.Window):
         # print(self.chDiz)
         self.__salva_origine()
         self.__salvaDestinatario()
+        self.__salva_cron()
+        self.__salva_altro()
 
         with open(self.fconf, "w") as data:
             data.write(str(self.bks))
