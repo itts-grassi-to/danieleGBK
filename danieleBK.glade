@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkMenu" id="menuST">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem" id="item1">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Visualizza/nNascondi</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onVisuNascondi" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="item2">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Chiudi</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onChiudi" swapped="no"/>
+      </object>
+    </child>
+  </object>
+</interface>

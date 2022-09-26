@@ -58,17 +58,17 @@ class Handler:
         self.window_is_hidden = True
         window.hide()
 
-    def onShowButtonClicked(self, button):
-        msg = "Clicked: " + entry.get_text()
-        dialog = Gtk.MessageDialog(window, 0, Gtk.MessageType.INFO,
-                                   Gtk.ButtonsType.OK, msg)
-        dialog.run()
-        dialog.destroy()
+    # def onShowButtonClicked(self, button):
+    #    msg = "Clicked: " + entry.get_text()
+    #    dialog = Gtk.MessageDialog(window, 0, Gtk.MessageType.INFO,
+    #                               Gtk.ButtonsType.OK, msg)
+    #    dialog.run()
+    #    dialog.destroy()
 
     def onNotify(self, *args):
         Notify.Notification.new("Notification", "Hello!", ICON).show()
 
-    def onShowOrHide(self, *args):
+    def onVisuNascondi(self, *args):
         if self.window_is_hidden:
             window.show()
         else:
@@ -76,7 +76,7 @@ class Handler:
 
         self.window_is_hidden = not self.window_is_hidden
 
-    def onQuit(self, *args):
+    def onChiudi(self, *args):
         Notify.uninit()
         # Gtk.main_quit()
         window.fine()
@@ -85,7 +85,7 @@ class Handler:
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 builder = Gtk.Builder()
-builder.add_from_file('gtk-example.glade')
+builder.add_from_file('danieleBK.glade')
 # builder.add(MainW)
 
 # window = builder.get_object('window1')
@@ -98,8 +98,8 @@ window.show_all()
 # window.hide()
 builder.connect_signals(Handler())
 
-entry = builder.get_object('entry1')
-menu = builder.get_object('menu1')
+#entry = builder.get_object('entry1')
+menu = builder.get_object('menuST')
 icon = TrayIcon(APPID, ICON, menu)
 Notify.init(APPID)
 

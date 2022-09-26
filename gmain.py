@@ -10,7 +10,6 @@ from motore_backup import MotoreBackup
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-
 class MainW(Gtk.Window, MotoreBackup):
 
 
