@@ -148,8 +148,8 @@ class MainW(Gtk.Window, MotoreBackup):
         self.thFine=True
         Gtk.main_quit()
 
-win = MainW()
+# win = MainW()
 
-win.connect("destroy", MainW.fine)
-win.show_all()
-Gtk.main()
+# win.connect("destroy", MainW.fine)
+# win.show_all()
+# Gtk.main()
