@@ -2,6 +2,7 @@
 ## daniele.ortu@itisgrassi.edu.it
 
 import ast
+import os
 # import logging
 import threading
 import datetime
@@ -9,7 +10,7 @@ import time
 
 from bkFile import bkFile
 
-
+CURRDIR = os.path.dirname(os.path.abspath(__file__))
 # from gmain import *
 
 class MotoreBackup(bkFile):
@@ -17,7 +18,7 @@ class MotoreBackup(bkFile):
         # self.fconf = fconf
         self.thFine = False
         self.__impoIni = True
-        self.fconf = "./danieleBK.conf"
+        self.fconf = os.path.join(CURRDIR, 'danieleBK.conf')
         threading.Thread(target=self.thread_function, args=(self.fconf,)).start()
 
     def set_restart_impostazioni(self):

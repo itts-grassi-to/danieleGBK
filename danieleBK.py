@@ -19,6 +19,7 @@ CURRDIR = os.path.dirname(os.path.abspath(__file__))
 # could be PNG or SVG as well
 #print(CURRDIR)
 ICON = os.path.join(CURRDIR, 'danieleBK.png')
+GLADE=os.path.join(CURRDIR, 'danieleBK.glade')
 # ICON = os.path.join(CURRDIR, 'python3.xpm')
 #print(ICON)
 # Cross-platform tray icon implementation
@@ -85,7 +86,7 @@ class Handler:
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 builder = Gtk.Builder()
-builder.add_from_file('danieleBK.glade')
+builder.add_from_file(GLADE)
 # builder.add(MainW)
 
 # window = builder.get_object('window1')
