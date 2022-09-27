@@ -86,7 +86,7 @@ class MotoreBackup(bkFile):
                             stesso_minuto[ch] = str(x)[14:16]
                             bks[ch]['attivo']=False
                             # print("thread_function: backuppo : " + ch)
-                            bf = bkFile(ch, bks)
+                            bf = bkFile(ch, bks, CURRDIR)
                             #bf.backuppaRSYNK()
                             threading.Thread(target=self.thread_backup, args=(bf, ch, bks,)).start()
                             #bks[ch]['attivo'] = True

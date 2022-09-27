@@ -12,9 +12,11 @@ from datetime import datetime
 
 
 class bkFile():
-    def __init__(self, ch, bks):
+    def __init__(self, ch, bks,cd):
         # super().__init__(fConf)
         # print("bkFile.__init__ : " + str(bks))
+        self._dirBASE = cd
+        # print(self._dirBASE)
         self.__inizializza_backup(ch, bks)
 
         self.initOK = True
