@@ -15,9 +15,9 @@ class bkFile():
     def __init__(self, ch, bks,cd):
         # super().__init__(fConf)
         # print("bkFile.__init__ : " + str(bks))
-        self._dirBASE = cd
+
         # print(self._dirBASE)
-        self.__inizializza_backup(ch, bks)
+        self.__inizializza_backup(ch, bks,cd)
 
         self.initOK = True
         # self.__f=f
@@ -54,12 +54,12 @@ class bkFile():
             self._latestDIR = self._dirBK + "/" + "latestDIR"+self._mntTO
         self._flog.write("\nFine inizializzazione processo")
 
-    def __inizializza_backup(self, ch, bks):
+    def __inizializza_backup(self, ch, bks,cd):
         data = bks[ch]
         print(data)
         self._remotoDA = data['dirDA']["remoto"]
         self._remotoTO = data['dirTO']["remoto"]
-        self._dirBASE = os.getcwd()
+        self._dirBASE = cd
         self._dirDA = data['dirDA']["da"]
         self._dirBK = data['dirTO']["to"]
         self._mntDA = data['dirDA']["mnt"]
