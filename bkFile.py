@@ -83,7 +83,7 @@ class bkFile():
         self._flog.close()
         if mail:
             dummy = 0
-            #os.system("mail -s  '" + self._nome + "' server.backup@itisgrassi.edu.it < " + self._fileLOG)
+            os.system("mail -s  '" + self._nome + "' server.backup@itisgrassi.edu.it < " + self._fileLOG)
 
     def backuppaRSYNK(self):
         self._flog.write("\n*********Inizio il processo di backup************")
