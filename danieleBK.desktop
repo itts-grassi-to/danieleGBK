@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
-Name=danieleBK
+Name=danieleGBK
 Type=Application
-Exec=sudo python3
-Terminal=true
-Icon=
+Exec=sudo python3 /home/neo/Scrivania/danieleBK/danieleGBK/danieleBK.py
+Terminal=false
+Icon=/home/neo/Scrivania/danieleBK/danieleGBK/danieleBK.png
 Comment=maipiu

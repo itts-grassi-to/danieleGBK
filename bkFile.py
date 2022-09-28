@@ -4,98 +4,107 @@
 
 # from danieleRSINK import tbk
 import os
+import ast
 import subprocess
 from datetime import datetime
 
 
-# import glob
-
+CURRDIR = os.path.dirname(os.path.abspath(__file__))
+DEBUG = True
 
 class bkFile():
-    def __init__(self, ch, bks,cd):
-        # super().__init__(fConf)
-        # print("bkFile.__init__ : " + str(bks))
-
-        # print(self._dirBASE)
-        self.__inizializza_backup(ch, bks,cd)
-
-        self.initOK = True
-        # self.__f=f
-        # self.__nomeTAR = ""
-        self._flog = f = open(self._fileLOG, "w")
+    #def __init__(self, ch, bks, cd):
+    def _printa(self, s):
+        if DEBUG:
+            print(s)
+    def __init__(self):
+        self._path_fconf = os.path.join(CURRDIR, 'danieleBK.conf')
+        self._path_fpar = os.path.join(CURRDIR, 'comunica.conf')
+        self._path_flog = os.path.join(CURRDIR, 'comunica.conf')
+        self._bks, self._altro = self.__get_impostazioni()
+        # self.__inizializza_backup()
+        #self.initOK = True
+        # self._flog = open(self._fileLOG, "w")
+    def _esegui(self):
         self._flog.write("Inizio processo di backup")
+        if self.__inizializza_paths():
+            self.__backuppa()
+
+    def __inizializza_paths(self):
         if self._remotoDA:
             self._flog.write("\nMonto directory da backuppare: " + self._dirDA)
-            if not self.isMount(self._dirDA):
-                r = subprocess.run(["sshfs", self._dirDA, self._dirBASE + "/" + self._mntDA],
+            mntDA = self._dirBASE + "/" + self._mntDA
+            if not self.__isMount(self._dirDA):
+                r = subprocess.run(["sshfs", self._dirDA, mntDA],
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if r.stderr:
                     self.__log("\nERRORE: " + r.stderr.decode("utf-8"), True)
                     self.initOK = False
-                    return
+                    return False
                 self._flog.write("\nDirectory montata")
             else:
                 self._flog.write("\nDirectory GIA montata")
-            self._dirDA = self._dirBASE + "/" + self._mntDA
+            self._dirDA = mntDA
         if self._remotoTO:
             self._flog.write("\nMonto directory dei backup: " + self._dirBK)
-            if not self.isMount(self._dirBK):
-                r = subprocess.run(["sshfs", self._dirBK, self._dirBASE + "/" + self._mntTO], stdout=subprocess.PIPE,
+            mntTO = self._dirBASE + "/" + self._mntTO
+            if not self.__isMount(self._dirBK):
+                r = subprocess.run(["sshfs", self._dirBK, mntTO], stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
                 if r.stderr:
                     self.__log("\nERRORE: " + r.stderr.decode("utf-8"), True)
                     self.initOK = False
-                    return
+                    return False
                 self._flog.write("\nDirectory montata")
             else:
                 self._flog.write("\nDirectory GIA montata")
-            self._dirBK = self._dirBASE + "/" + self._mntTO
+            self._dirBK = mntTO
 
             self._latestDIR = self._dirBK + "/" + "latestDIR"+self._mntTO
         self._flog.write("\nFine inizializzazione processo")
-
-    def __inizializza_backup(self, ch, bks,cd):
-        data = bks[ch]
-        print(data)
+        return True
+    def __get_impostazioni(self):
+        with open(self._path_fconf, "r") as data:
+            d = ast.literal_eval(data.read())
+            data.close()
+        # d=MainW.get_impostazioni(self.fconf)
+        return d['bks'], d['altro']
+    def __inizializza_backup(self, ch):
+        data = self._bks[ch]
+        if DEBUG:
+            self._printa(data)
         self._remotoDA = data['dirDA']["remoto"]
         self._remotoTO = data['dirTO']["remoto"]
-        self._dirBASE = cd
+        self._dirBASE = CURRDIR
         self._dirDA = data['dirDA']["da"]
         self._dirBK = data['dirTO']["to"]
         self._mntDA = data['dirDA']["mnt"]
         self._mntTO =  data['dirTO']["mnt"]
-        # self._tmp = data["dirTMP"]
         self._nome = ch
-        # self._maxBK = data["maxBK"]
-        self._fileLOG = self._dirBASE + "/" + self._nome + ".log"
-        # self._do=str(date.today())
+        self._flog = open(self._path_flog + "/" + self._nome + ".log", "w")
         self._do = datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
         self._latestDIR = self._dirBK + "/" + "latestDIR"
         self._nomeStatoFile = "stf.bin"
         self.__nomeTAR = self._do + "-" + self._nome + ".tar.gz"
-
-    # def __preparaFile(self):
-    #    self.__nomeTAR = self._do + "-" + self._nome + ".tar.gz"
-    def isMount(self, sub):
+    def __isMount(self, sub):
         r = subprocess.run(["df"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return sub in str(r.stdout)
-
     def __log(self, msg, mail):
         self._flog.write(msg)
         self._flog.close()
-        if mail:
+        if mail and not DEBUG:
             dummy = 0
             os.system("mail -s  '" + self._nome + "' server.backup@itisgrassi.edu.it < " + self._fileLOG)
 
-    def backuppaRSYNK(self):
+    def __backuppa(self):
         self._flog.write("\n*********Inizio il processo di backup************")
-        # print("*************************************"+self._do)
         self._flog.write("\nUso come base: " + self._latestDIR)
         attr = '-auv --link-dest "' + self._latestDIR + '" --exclude=".cache" '
-        self._flog.write(
-            "rsync " + attr + "\n\t" + self._dirDA + "/\n\t" + self._dirBK + "/" + self._do + "-" + self._nome + " > " + self._fileLOG)
-        r = os.system(
-            "rsync " + attr + self._dirDA + "/ " + self._dirBK + "/" + self._do + "-" + self._nome + " > " + self._fileLOG)
+        dirBK = self._dirBK + "/" + self._do + "-" + self._nome
+        rsync = "rsync " + attr + "\n\t" + self._dirDA + "/\n\t" + dirBK + " > " + self._fileLOG
+        self._flog.write("\n" + rsync)
+        r = os.system("rsync " + attr + self._dirDA + "/ " + dirBK + " > " + self._fileLOG)
+            # "rsync " + attr + self._dirDA + "/ " + self._dirBK + "/" + self._do + "-" + self._nome + " > " + self._fileLOG)
         # r=subprocess.run(["rsync",attr+self._dirDA+"/ "+ self._dirBK+"/"+self._do+"-"+self._nome],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         # if r.stderr:
         #    self.__log("\nERRORE: "+r.stderr.decode("utf-8"),True)
@@ -105,77 +114,12 @@ class bkFile():
         self._flog = f = open(self._fileLOG, "a")
         self._flog.write("\nRimuovuo: " + self._latestDIR)
         r = os.system("rm -rf " + self._latestDIR)
-        # print("\n"+r)
         self._flog.write("\nNuova base: " + self._dirBK + "/" + self._do + "-" + self._nome)
         self._flog.write("\nCreo link: ln -s " + self._dirBK + "/" + self._do + "-" + self._nome + " " + self._latestDIR)
         r = os.system("ln -s " + self._dirBK + "/" + self._do + "-" + self._nome + " " + self._latestDIR)
-        # print("\n"+r)
 
         self.__log("\nPROCESSO ESEGUITO CON SUCESSO\n\n", True)
-    # def backuppa(self):
-    # f = open(self._fileLOG, "a")
-    # ***********************************************************************
-    # self.__flog.write("\nCopio il file "+self._dirDA+"/"+self.__f+" in "+self._tmp+"/")
-    # print("\nCopio il file "+self._dirDA+"/"+self.__f+" in "+self._tmp+"/")
-    # if self._remoto["from"]:
-    #    r=subprocess.run(["scp",self._dirDA+"/"+self.__f,self._tmp+"/"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    # else:
-    # r=subprocess.run(["cp",self._dirDA+"/"+self.__f,self._tmp+"/"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    # print(r.stderr)
-    # if r.stderr:
-    #    self.__log("\nERRORE: "+r.stderr.decode("utf-8"),True)
-    #    return
-    # self.__flog.write("\nFile "+self._dirDA+"/"+self.__f+" copiato")
-    # ***********************************************************************
-    # ls=self._getListaBackup()
-    # if len(ls)!=0:
-    #    ls.reverse()
-    #    print("da fare: controllare data")
-    # return
-    # ***********************************************************************
-    # self.__flog.write("\nCambio directory: "+self._tmp)
-    # r=os.chdir(self._tmp)
-    # if r:
-    #    self.__log("\nERRORE: cambio direcotry",True)
-    #    return
-    # self.__flog.write("\nDirectory cambiata")
-    # ***********************************************************************
-    # self.__flog.write("\nComprimo "+self.__nomeTAR)
-    # print("\nComprimo "+self.__nomeTAR)
-    # self.__preparaFile()
-    # r=subprocess.run(["tar","zfc",self.__nomeTAR,self.__f],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    # if r.stderr:
-    #    self.__log("\nERRORE: "+r.stderr.decode("utf-8"),True)
-    #    return
-    # self.__flog.write("\nFile compresso")
-    # ***********************************************************************
-    # self.__preparaFile()
-    # self.__flog.write("\nCopio file "+self.__nomeTAR+" in "+self._dirBK)
-    # print("\nCopio file "+self.__nomeTAR+" in "+self._dirBK)
-    # if self._remoto["to"]:
-    #    r=subprocess.run(["scp",self.__nomeTAR,self._dirBK+"/"+self.__nomeTAR],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    # else:
-    # r=subprocess.run(["cp",self.__nomeTAR,self._dirBK+"/"+self.__nomeTAR],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    # if r.stderr:
-    #    self.__log("\nERRORE: "+r.stderr.decode("utf-8"),True)
-    #    return
-    # self.__flog.write("\nFile copiato")
+        self._flog.close()
 
-    # self.__flog.write("\nPulisco "+self._tmp)
-    # for i in glob.glob(os.path.join(self._tmp,'*')):
-    #    if os.path.isdir(i):
-    #        shutil.rmtree(path)
-    #    else:
-    #        os.remove(i)
-    # self.__flog.write("\nDirectory ripulita")
-
-    # self.__flog.write("\nElimina vecchi")
-    # r=self._rimuoviVecchi()
-    # self.__flog.write(r)
-    # self.__log("\nPROCESSO ESEGUITO CON SUCESSO",True)
-    # self.__flog.close()
-
-# c=bkFile("infoschool.json","AXIOSDATABASE.FDB")
-# c=bkFile("infoschool.json","pipi.txt")
-# if c.initOK:
-#    c.backuppa()
+# c=bkFile('chDef')
+# c._esegui()

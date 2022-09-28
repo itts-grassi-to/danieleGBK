@@ -15,7 +15,7 @@ class MainW(Gtk.Window, MotoreBackup):
 
     def __init__(self):
         Gtk.Window.__init__(self, title="DANIELE BACKUP")
-        MotoreBackup.__init__(self)
+
         self.set_default_size(500, 300)
         self.set_border_width(20)
         # self.fconf = "./danieleBK.conf"
@@ -147,8 +147,8 @@ class MainW(Gtk.Window, MotoreBackup):
         self.thFine=True
         Gtk.main_quit()
 
-# win = MainW()
+win = MainW()
 
-# win.connect("destroy", MainW.fine)
-# win.show_all()
-# Gtk.main()
+win.connect("destroy", MainW.fine)
+win.show_all()
+Gtk.main()
