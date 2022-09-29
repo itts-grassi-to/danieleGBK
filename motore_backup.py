@@ -12,14 +12,14 @@ from bkFile import *
 
 class MotoreBackup(bkFile):
     def __init__(self):
-
         super().__init__()
         # print(self._path_fpar)
         self.__settaVariabiliComunicazione(self._path_fpar, "0", "0")
         self.__fpar = open(self._path_fpar, "rb")
         self.__leggiVariabiliComunicazione(self.__fpar)
-    def __settaVariabiliComunicazione(self, fpar, fine, impo):
-        fpar = open(fpar, "wb")
+
+    def __settaVariabiliComunicazione(self, path_fpar, fine, impo):
+        fpar = open(path_fpar, "wb")
         fpar.write((fine+impo).encode("utf-8"))
         fpar.close()
 
@@ -63,32 +63,31 @@ class MotoreBackup(bkFile):
         while self.__thFine == 0:
             if self.__impoIni == 1:
                 print("restart**********************")
-                self.__impoIni = False
-                bks, altro = self.__get_impostazioni(self._fconf)
+                self.__settaVariabiliComunicazione(NOME_FPAR, str(self.__thFine), "0")
+                self._bks, self._altro = self._get_impostazioni()
 
             for ch in self._bks:
                 if ch not in stesso_minuto:
                     stesso_minuto[ch] = ""
                 if self._bks[ch]['attivo']:
                     x = datetime.now()
-                    print(datetime.now())
-                    # print(ch, "-----", bks[ch]['attivo'], "--------------", self.__startBK(x, bks[ch]['cron']))
+                    self._printa(datetime.now())
+                    print(ch, "-----", self._bks[ch]['attivo'], "--------------", stesso_minuto[ch] == str(x)[14:16])
                     if self.__startBK(x, self._bks[ch]['cron']):
                         # print(str(x)[14:16])
                         # print("thread_function: seleziono backup")
                         # print("thread_function: stesso_minuto["+ch+"]= "+ stesso_minuto[ch])
-                        if bks[ch]['attivo'] and stesso_minuto[ch] != str(x)[14:16] :
+                        if self._bks[ch]['attivo'] and stesso_minuto[ch] != str(x)[14:16] :
                             stesso_minuto[ch] = str(x)[14:16]
-                            bks[ch]['attivo']=False
+                            # self._bks[ch]['attivo']=False
                             # print("thread_function: backuppo : " + ch)
-                            bf = bkFile(ch, bks, CURRDIR)
-                            #bf.backuppaRSYNK()
-                            threading.Thread(target=self.thread_backup, args=(bf, ch, bks,)).start()
-                            #bks[ch]['attivo'] = True
-
-            time.sleep(2)
+                            bf = bkFile()
+                            threading.Thread(target=self._esegui, args=(ch, )).start()
+                # print("CH: "+ch, self._bks[ch]['attivo'])
+            print("************************leggo variabili")
             self.__leggiVariabiliComunicazione(self.__fpar)
+            time.sleep(2)
         self.__fpar.close()
         print("FINE: thread_function")
-m=MotoreBackup()
-m.esegui()
+# m=MotoreBackup()
+# m.esegui()

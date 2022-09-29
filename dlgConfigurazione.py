@@ -33,9 +33,9 @@ class Msg(Gtk.Dialog):
 
 
 class DlgNuovo(Gtk.Window):
-    def __init__(self, parent):
+    def __init__(self, parent, fconf):
         super().__init__(title="Nuovo backups")
-        # self.fconf = fconf
+        self.fconf = fconf
         # with open(self.fconf, "r") as data:
         #    self.bks = ast.literal_eval(data.read())
         #    data.close()
@@ -113,7 +113,7 @@ class DlgNuovo(Gtk.Window):
         self.parent.lst_chiavi.append(ch)
         os.system("mkdir -p "+self.parent.bks['bks'][ch]['dirDA']['mnt'])
         os.system("mkdir -p "+self.parent.bks['bks'][ch]['dirTO']['mnt'])
-        with open(self.parent.fconf, "w") as data:
+        with open(self.fconf, "w") as data:
             data.write(str(self.parent.bks))
             data.close()
     def on_annulla_clicked(self, bt):
@@ -140,9 +140,9 @@ class DlgNuovo(Gtk.Window):
 
 class DlgConf(Gtk.Window):
     # def __init__(self, fconf, chDiz, th):
-    def __init__(self, parent):
+    def __init__(self, parent, fconf):
         # print(chDiz)
-        self.fconf = parent.fconf
+        self.fconf = fconf
         self.chDiz = parent.lst_chiavi[parent.lstMain.get_selected_row().get_index()]
         self.parent=parent
         with open(self.fconf, "r") as data:
