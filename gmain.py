@@ -17,7 +17,7 @@ class MainW(Gtk.Window):
 
     def __init__(self):
         Gtk.Window.__init__(self, title="DANIELE BACKUP")
-        print(NOME_FCONF)
+        # print(NOME_FCONF)
         self.set_default_size(500, 300)
         self.set_border_width(20)
         self.bks = self.__get_impostazioni(NOME_FCONF)

@@ -12,7 +12,7 @@ CURRDIR = os.path.dirname(os.path.abspath(__file__))
 NOME_FCONF = os.path.join(CURRDIR, 'danieleBK.conf')
 NOME_FPAR = os.path.join(CURRDIR, 'comunica.conf')
 
-DEBUG = True
+DEBUG = False
 
 
 class bkFile():
@@ -25,12 +25,28 @@ class bkFile():
         self._path_fconf = NOME_FCONF
         self._path_fpar = NOME_FPAR
         self._bks, self._altro = self._get_impostazioni()
+
+    def _is_running(self, ps):
+        r = subprocess.run(["ps", "-e"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if r.stderr:
+            print("\nERRORE: " + r.stderr.decode("utf-8"))
+            return False
+        l = r.stdout.decode("utf-8").split("\n")
+
+        for ch in l:
+            print(ch)
+            if ps in ch:
+                return True
+        return False
+        # print(ch)
+
     def _esegui(self, ch):
         self.__inizializza_backup(ch)
         self._flog.write("Variabili inizializzate")
         if self.__inizializza_paths():
             self.__backuppa()
         self._printa("********************** fine thread")
+
     def __inizializza_backup(self, ch):
         data = self._bks[ch]
         if DEBUG:
@@ -49,6 +65,7 @@ class bkFile():
         self._latestDIR = self._dirBK + "/" + "latestDIR"
         self._nomeStatoFile = "stf.bin"
         self.__nomeTAR = self._do + "-" + self._nome + ".tar.gz"
+
     def __inizializza_paths(self):
         if self._remotoDA:
             self._flog.write("\nMonto directory da backuppare: " + self._dirDA)
@@ -82,15 +99,18 @@ class bkFile():
             self._latestDIR = self._dirBK + "/" + "latestDIR" + self._mntTO
         self._flog.write("\nFine inizializzazione processo")
         return True
+
     def _get_impostazioni(self):
         with open(self._path_fconf, "r") as data:
             d = ast.literal_eval(data.read())
             data.close()
         # d=MainW.get_impostazioni(self.fconf)
         return d['bks'], d['altro']
+
     def __isMount(self, sub):
         r = subprocess.run(["df"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return sub in str(r.stdout)
+
     def __log(self, msg, mail):
         self._flog.write(msg)
         self._flog.close()
@@ -120,5 +140,6 @@ class bkFile():
         print("Finito backup")
         self._flog.close()
 
-# c=bkFile('chDef')
+
+ # c = bkFile()
 # c._esegui()

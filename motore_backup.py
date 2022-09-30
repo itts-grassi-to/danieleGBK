@@ -1,6 +1,6 @@
 ## CREATO DA ORTU prof. DANIELE
 ## daniele.ortu@itisgrassi.edu.it
-
+import sys
 # import ast
 # import os
 import threading
@@ -14,7 +14,8 @@ class MotoreBackup(bkFile):
     def __init__(self):
         super().__init__()
         # print(self._path_fpar)
-        self.__settaVariabiliComunicazione(self._path_fpar, "0", "0")
+        l = sys.argv[0].split("/")
+        self.__nomePS = l[len(l)-1].split(".")[0]
         self.__fpar = open(self._path_fpar, "rb")
         self.__leggiVariabiliComunicazione(self.__fpar)
 
@@ -50,16 +51,15 @@ class MotoreBackup(bkFile):
                 return False
 
         return True
-    def thread_backup(self,bf, ch, bks):
-        print("Inizio backup "+ch)
-        bf.backuppaRSYNK()
-        # time.sleep(60)
-        #print("backup finito**********************************************")
-        bks[ch]['attivo'] = True
-        print("Finisco backup "+ch)
     def esegui(self):
         # st = True
         stesso_minuto = {}
+        # print(self.__nomePS)
+        #if self._is_running(self.__nomePS):
+        #    print("motore_backup - esegui: Processo attivo")
+        #    return
+        self.__settaVariabiliComunicazione(self._path_fpar, "0", "0")
+        print("AVVIO il motore.. brum brum")
         while self.__thFine == 0:
             if self.__impoIni == 1:
                 print("restart**********************")
@@ -71,8 +71,8 @@ class MotoreBackup(bkFile):
                     stesso_minuto[ch] = ""
                 if self._bks[ch]['attivo']:
                     x = datetime.now()
-                    self._printa(datetime.now())
-                    print(ch, "-----", self._bks[ch]['attivo'], "--------------", stesso_minuto[ch] == str(x)[14:16])
+                    # self._printa(datetime.now())
+                    # print(ch, "-----", self._bks[ch]['attivo'], "--------------", stesso_minuto[ch] == str(x)[14:16])
                     if self.__startBK(x, self._bks[ch]['cron']):
                         # print(str(x)[14:16])
                         # print("thread_function: seleziono backup")
@@ -84,10 +84,10 @@ class MotoreBackup(bkFile):
                             bf = bkFile()
                             threading.Thread(target=self._esegui, args=(ch, )).start()
                 # print("CH: "+ch, self._bks[ch]['attivo'])
-            print("************************leggo variabili")
+            # print("************************leggo variabili")
             self.__leggiVariabiliComunicazione(self.__fpar)
             time.sleep(2)
         self.__fpar.close()
-        print("FINE: thread_function")
+        print("SPENGO il motore.. put put")
 # m=MotoreBackup()
 # m.esegui()
